@@ -1,0 +1,82 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#111827">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Pick 3 + 4">
+<title>Mi Calculadora Pick 3 + Pick 4</title>
+<style>
+:root{color-scheme:dark;--bg:#0b1020;--panel:#151d31;--panel2:#1c2740;--text:#f4f7ff;--muted:#a7b2ca;--accent:#67e8c0;--blue:#7aa7ff;--red:#ff8d9a;--line:#2b3854}
+*{box-sizing:border-box}body{margin:0;background:linear-gradient(180deg,#111a30,#080c17 65%);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;color:var(--text);min-height:100vh;padding:env(safe-area-inset-top) 14px calc(24px + env(safe-area-inset-bottom))}
+main{max-width:620px;margin:auto}.top{padding:20px 4px 12px}.eyebrow{color:var(--accent);font-size:12px;font-weight:800;letter-spacing:1.7px;text-transform:uppercase}h1{font-size:28px;line-height:1.1;margin:8px 0}p{color:var(--muted);margin:6px 0 0;line-height:1.45}.panel{background:rgba(21,29,49,.96);border:1px solid var(--line);border-radius:20px;padding:16px;margin:12px 0;box-shadow:0 10px 30px #0002}.tabs{display:grid;grid-template-columns:1fr 1fr;gap:8px}.tab,button,select,input{font:inherit}button,.tab{border:0;border-radius:13px;padding:12px 14px;font-weight:750;cursor:pointer}.tab{background:var(--panel2);color:var(--muted)}.tab.active{background:var(--accent);color:#06251e}.display{margin:14px 0;background:#080d18;border:1px solid var(--line);border-radius:16px;padding:15px;text-align:center}.display small{color:var(--muted);display:block;font-size:11px;letter-spacing:1.2px}.number{font-size:46px;font-weight:850;letter-spacing:8px;margin:6px 0 2px;font-variant-numeric:tabular-nums;min-height:55px}.subline{color:var(--accent);font-size:13px;font-weight:700}.keys{display:grid;grid-template-columns:repeat(3,1fr);gap:9px}.key{background:#26334e;color:var(--text);font-size:22px;min-height:54px}.key.action{background:#394967}.key.clear{color:var(--red)}.primary{background:var(--accent);color:#05251e;width:100%;margin-top:10px}.secondary{background:#2a3957;color:var(--text)}.blue{background:var(--blue);color:#0a1834}.row{display:flex;gap:8px;align-items:center}.row>*{flex:1;min-width:0}.field{width:100%;background:#0c1323;color:var(--text);border:1px solid var(--line);padding:12px;border-radius:12px;margin-top:6px}.label{display:block;color:var(--muted);font-size:12px;font-weight:700;margin:10px 0 4px}.sectiontitle{font-size:17px;margin:0 0 10px}.chips{display:flex;gap:7px;flex-wrap:wrap;margin:8px 0}.chip{background:#24324c;border:1px solid #3a4a69;border-radius:10px;padding:7px 10px;font-size:12px;color:var(--text)}.entry{padding:12px;background:#0d1526;border:1px solid var(--line);border-radius:14px;margin:8px 0}.entryhead{display:flex;align-items:center;justify-content:space-between;gap:8px}.entrynum{font-size:23px;font-weight:850;letter-spacing:3px}.muted{color:var(--muted);font-size:12px}.matches{color:var(--accent);font-size:13px;font-weight:700;margin-top:6px}.mini{padding:7px 9px;font-size:12px;border-radius:9px}.danger{background:#482637;color:#ffc5ce}.empty{text-align:center;color:var(--muted);padding:18px 4px}.hidden{display:none!important}.note{font-size:11px;color:var(--muted);line-height:1.45;margin-top:14px}.footer{text-align:center;color:#7887a4;font-size:11px;padding:12px}
+</style>
+</head>
+<body>
+<main>
+<header class="top"><div class="eyebrow">Tu asistente de jugadas</div><h1>Pick 3 <span style="color:var(--accent)">+</span> Pick 4</h1><p>Calcula, guarda y compara tus números en un solo lugar.</p></header>
+<section class="panel">
+<div class="tabs"><button class="tab active" id="tab3" onclick="setMode(3)">PICK 3</button><button class="tab" id="tab4" onclick="setMode(4)">PICK 4</button></div>
+<div class="display"><small>NÚMERO ACTUAL</small><div class="number" id="display">---</div><div class="subline" id="breakdown">Centena · Fijos</div></div>
+<div class="keys" id="keys">
+<button class="key" onclick="digit('1')">1</button><button class="key" onclick="digit('2')">2</button><button class="key" onclick="digit('3')">3</button>
+<button class="key" onclick="digit('4')">4</button><button class="key" onclick="digit('5')">5</button><button class="key" onclick="digit('6')">6</button>
+<button class="key" onclick="digit('7')">7</button><button class="key" onclick="digit('8')">8</button><button class="key" onclick="digit('9')">9</button>
+<button class="key clear" onclick="clearNumber()">Borrar</button><button class="key" onclick="digit('0')">0</button><button class="key action" onclick="backspace()">⌫</button>
+</div>
+<div class="row" style="margin-top:10px"><button class="secondary" onclick="generateOne()">🎲 Aleatorio</button><button class="primary" style="margin:0" onclick="saveCurrent()">Guardar jugada</button></div>
+<div class="note">Pick 3: primer dígito = centena; últimos dos = fijos. Pick 4: se divide en dos pares corridos.</div>
+</section>
+<section class="panel">
+<h2 class="sectiontitle">Generador automático</h2>
+<div class="row"><div><label class="label" for="genMode">Tipo</label><select id="genMode" class="field"><option value="3">Pick 3</option><option value="4">Pick 4</option><option value="mix">Mezclar Pick 3 + Pick 4</option></select></div><div><label class="label" for="qty">Cantidad</label><select id="qty" class="field"><option>5</option><option>10</option><option>20</option><option>30</option></select></div></div>
+<button class="primary" onclick="generateBatch()">Generar números</button><div id="generated"></div>
+</section>
+<section class="panel">
+<h2 class="sectiontitle">Mis jugadas <span class="muted" id="pickCount"></span></h2>
+<input id="search" class="field" placeholder="Buscar número o tipo..." oninput="renderPicks()">
+<div id="picks"></div>
+<div class="row"><button class="secondary" onclick="exportData()">Exportar respaldo</button><button class="secondary" onclick="document.getElementById('importFile').click()">Importar respaldo</button></div><input type="file" id="importFile" accept="application/json" class="hidden" onchange="importData(event)">
+</section>
+<section class="panel">
+<h2 class="sectiontitle">Registrar resultado ganador</h2>
+<div class="row"><div><label class="label">Tipo de sorteo</label><select id="resultMode" class="field"><option value="3">Pick 3</option><option value="4">Pick 4</option></select></div><div><label class="label">Resultado</label><input id="winning" class="field" inputmode="numeric" maxlength="4" placeholder="Ej. 123" oninput="this.value=this.value.replace(/\D/g,'').slice(0,Number(document.getElementById('resultMode').value) )"></div></div>
+<div class="row"><div><label class="label">Fecha</label><input id="resultDate" type="date" class="field"></div><div><label class="label">Sorteo</label><select id="draw" class="field"><option>Mediodía</option><option>Noche</option></select></div></div>
+<button class="primary" onclick="saveResult()">Guardar y comparar</button><div id="compareOutput"></div>
+</section>
+<section class="panel">
+<h2 class="sectiontitle">Historial de resultados</h2><div id="history"></div><button class="secondary" style="width:100%;margin-top:8px" onclick="clearHistory()">Borrar historial</button>
+</section>
+<div class="footer">Tus datos se guardan en este navegador. Esta herramienta no está afiliada a la lotería oficial y no garantiza premios.</div>
+</main>
+<script>
+let mode=3,current='',picks=[],history=[];
+const $=id=>document.getElementById(id);
+try{picks=JSON.parse(localStorage.getItem('p34_picks')||'[]');history=JSON.parse(localStorage.getItem('p34_history')||'[]')}catch(e){}
+$('resultDate').value=new Date().toLocaleDateString('en-CA');
+function persist(){try{localStorage.setItem('p34_picks',JSON.stringify(picks));localStorage.setItem('p34_history',JSON.stringify(history))}catch(e){alert('No se pudo guardar en este navegador. Exporta un respaldo para conservar tus datos.')}}
+function setMode(m){mode=m;current='';$('tab3').classList.toggle('active',m===3);$('tab4').classList.toggle('active',m===4);$('display').textContent='---';$('breakdown').textContent=m===3?'Centena · Fijos':'Corridos: par 1 · par 2';$('winning').maxLength=m;$('winning').value='';updateDisplay()}
+function updateDisplay(){ $('display').textContent=current.padEnd(mode,'–').split('').join(' ');if(!current)$('display').textContent='---';$('breakdown').textContent=mode===3?(current.length===3?'Centena: '+current[0]+' · Fijos: '+current.slice(1):'Centena · Fijos'):(current.length===4?'Corridos: '+current.slice(0,2)+' · '+current.slice(2):'Corridos: par 1 · par 2')}
+function digit(d){if(current.length<mode)current+=d;updateDisplay()}
+function clearNumber(){current='';updateDisplay()}
+function backspace(){current=current.slice(0,-1);updateDisplay()}
+function rand(m){return Array.from({length:m},()=>Math.floor(Math.random()*10)).join('')}
+function generateOne(){current=rand(mode);updateDisplay()}
+function saveCurrent(){if(current.length!==mode){alert('Introduce los '+mode+' dígitos primero.');return}addPick(mode,current);current='';updateDisplay()}
+function addPick(m,n){if(picks.some(p=>p.mode===m&&p.num===n)){alert('Ese número ya está guardado.');return}picks.unshift({id:Date.now()+Math.random(),mode:m,num:n,created:new Date().toISOString()});persist();renderPicks()}
+function generateBatch(){let m=$('genMode').value,q=Number($('qty').value),out=[];for(let i=0;i<q;i++){let mm=m==='mix'?(Math.random()<.5?3:4):Number(m);out.push({mode:mm,num:rand(mm)})}out.forEach(p=>addPick(p.mode,p.num));$('generated').innerHTML='<div class="chips">'+out.map(p=>'<span class="chip">P'+p.mode+' · '+p.num+'</span>').join('')+'</div><div class="muted">Se añadieron '+out.length+' jugadas a tu lista.</div>'}
+function renderPicks(){let q=($('search').value||'').toLowerCase(),list=picks.filter(p=>(p.num+' pick '+p.mode).includes(q));$('pickCount').textContent='('+picks.length+')';$('picks').innerHTML=list.length?list.map(p=>`<div class="entry"><div class="entryhead"><div><div class="muted">PICK ${p.mode}</div><div class="entrynum">${p.num}</div><div class="muted">${p.mode===3?'Centena '+p.num[0]+' · Fijos '+p.num.slice(1):'Corridos '+p.num.slice(0,2)+' y '+p.num.slice(2)}</div></div><button class="mini danger" onclick="removePick('${p.id}')">Eliminar</button></div></div>`).join(''):'<div class="empty">Todavía no hay jugadas guardadas.</div>'}
+function removePick(id){picks=picks.filter(p=>String(p.id)!==id);persist();renderPicks()}
+function saveResult(){let m=Number($('resultMode').value),n=$('winning').value;if(n.length!==m){alert('Escribe un resultado de '+m+' dígitos.');return}let r={id:Date.now(),mode:m,num:n,date:$('resultDate').value,draw:$('draw').value};history.unshift(r);persist();compareResult(r);renderHistory()}
+function compareResult(r){let matches=picks.filter(p=>p.mode===r.mode&&p.num===r.num);let partial=picks.filter(p=>p.mode===r.mode&&p.num!==r.num&&p.num.split('').some((d,i)=>r.num.includes(d)));$('compareOutput').innerHTML=`<div class="entry"><b>Resultado: ${r.num}</b><div class="muted">${r.date} · ${r.draw} · Pick ${r.mode}</div><div class="matches">Coincidencias exactas: ${matches.length}</div><div class="muted">Jugadas con dígitos compartidos: ${partial.length} (informativo; no significa premio oficial)</div>${matches.map(p=>'<div class="chip">¡Exacto! '+p.num+'</div>').join('')}</div>`}
+function renderHistory(){$('history').innerHTML=history.length?history.map(r=>`<div class="entry"><div class="entryhead"><div><div class="muted">${r.date||''} · ${r.draw||''} · PICK ${r.mode}</div><div class="entrynum">${r.num}</div></div><button class="mini secondary" onclick="compareById(${r.id})">Comparar</button></div></div>`).join(''):'<div class="empty">Aún no has registrado resultados.</div>'}
+function compareById(id){let r=history.find(x=>x.id===id);if(r)compareResult(r)}
+function clearHistory(){if(confirm('¿Borrar todos los resultados del historial?')){history=[];persist();renderHistory();$('compareOutput').innerHTML=''}}
+function exportData(){let blob=new Blob([JSON.stringify({picks,history},null,2)],{type:'application/json'}),url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download='respaldo-pick3-pick4.json';a.click();URL.revokeObjectURL(url)}
+function importData(e){let f=e.target.files[0];if(!f)return;let rd=new FileReader();rd.onload=()=>{try{let d=JSON.parse(rd.result);if(!Array.isArray(d.picks)||!Array.isArray(d.history))throw 0;picks=d.picks;history=d.history;persist();renderPicks();renderHistory();alert('Respaldo importado.')}catch(err){alert('El archivo no parece un respaldo válido.')}};rd.readAsText(f)}
+renderPicks();renderHistory();updateDisplay();
+</script>
+</body>
+</html>
